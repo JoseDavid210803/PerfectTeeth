@@ -24,6 +24,9 @@ SECRET_KEY = 'django-insecure-cqfaca4z*=)rx+b97o%^2lco$n@^o9&o2p_9g+yuqtkz5w)e$u
 DEBUG = False
 ALLOWED_HOSTS = ["perfectteeth-production.up.railway.app"]
 
+CSRF_TRUSTED_ORIGINS = [
+    "https://perfectteeth-production.up.railway.app"
+]
 
 # Application definition
 INSTALLED_APPS = [

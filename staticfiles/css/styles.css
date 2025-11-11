@@ -1,0 +1,612 @@
+/* static/css/login_style.css */
+
+/* --- Configuración General --- */
+body {
+  /*Estas son las líneas clave para el fondo*/
+  background-image: url("../imagenes/diente.jpeg"); /* Ruta a tu imagen */
+  background-size: cover;          /* Cubre toda la pantalla sin deformar la imagen */
+  background-position: center;     /* Centra la imagen */
+  background-repeat: no-repeat;    /* Evita que la imagen se repita */
+  background-attachment: fixed;    /* Fija el fondo para que no se mueva al hacer scroll */
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+
+.main-container {
+  flex-grow: 1;
+  width: 100%;
+  max-width: 1200px; /* Ancho máximo para centrar el contenido */
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+/* --- Encabezado --- */
+.page-header {
+  display: flex;
+  align-items: center;
+  padding: 2rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-logo {
+  height: 130px;
+  width: auto;
+  margin-right: 25px;
+}
+
+.header-title h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 3.5rem;
+  margin: 0;
+  font-weight: 700;
+}
+
+.header-title p {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+.text-color  {
+ color: #073654;
+ font-weight: 900;
+}
+
+/* --- Contenido Principal --- */
+.page-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3rem 0;
+  gap: 2rem;
+  flex-grow: 1;
+}
+
+.login-column {
+  flex-basis: 45%;
+}
+
+.image-column {
+  flex-basis: 50%;
+  text-align: center;
+}
+
+.hero-image {
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- Caja de Login --- */
+.login-box {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2.5rem; /* Más relleno */
+  border-radius: 8px;
+}
+
+.login-text {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-top: 0;
+  margin-bottom: 2rem;
+}
+
+.button-group {
+  display: flex;
+  justify-content: space-around;
+  gap: 1.5rem;
+}
+
+.btn-login {
+  background-color: #4D45E1; /* Color azul/morado del prototipo */
+  color: #ffffff;
+  text-decoration: none;
+  padding: 1rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  text-align: center;
+  border: none;
+  flex-grow: 1;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-login:hover {
+  background-color: #3a32b8;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.btn-login b {
+  font-weight: 700; /* Texto en negrita como en la imagen */
+}
+
+/* --- Pie de Página --- */
+.page-footer {
+  background-color: #000000;
+  /* Hacemos el footer más delgado reduciendo el padding */
+  padding: 1rem 2rem; 
+  margin-top: auto;
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.footer-main-content {
+  width: 100%;
+  display: flex;
+  /* Alinea el logo a la izquierda y el texto a la derecha */
+  justify-content: space-between; 
+  align-items: center;
+  gap: 2rem;
+  margin-bottom: 1rem; /* Espacio antes del copyright */
+}
+
+.footer-logo {
+  height: 80px; /* Reducimos un poco el tamaño */
+  /* === TRUCO PARA CAMBIAR EL COLOR DEL LOGO A BLANCO === 
+  filter: brightness(0) invert(1);*/
+}
+
+.footer-info {
+  /* Alinea el texto a la izquierda dentro de su contenedor */
+  text-align: left;
+}
+
+.footer-info p {
+  margin: 4px 0;
+  font-size: 0.95rem;
+  color: #e0e0e0;
+}
+
+.footer-info p strong {
+  color: #ffffff;
+  font-weight: normal;
+  letter-spacing: 1px;
+}
+
+.footer-copyright {
+  width: 100%;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #ccc;
+  font-family: 'Roboto', sans-serif;
+  /* Quitamos la línea superior */
+  border-top: none; 
+}
+
+/* --- Estilos para Formularios --- */
+.form-box {
+  background-color: rgba(0, 0, 0, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2.5rem;
+  border-radius: 8px;
+  color: #fff;
+}
+
+.form-box h2 {
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-family: 'Playfair Display', serif;
+}
+
+.form-box .form-label {
+  color: #ccc;
+  font-weight: 500;
+  margin-bottom: .3rem;
+  font-size: 0.9rem;
+}
+
+.form-box .form-control,
+.form-box .form-select {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 5px;
+}
+
+.form-box .form-control::placeholder {
+  color: #aaa;
+}
+
+.form-box .form-control:focus,
+.form-box .form-select:focus {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: #4D45E1;
+  box-shadow: 0 0 0 0.25rem rgba(77, 69, 225, 0.5);
+  color: #fff;
+}
+
+/* Para que las opciones del select se vean en modo oscuro (en algunos navegadores) */
+.form-box .form-select option {
+    background: #343a40;
+    color: #fff;
+}
+
+.form-box .btn-submit {
+  width: 100%;
+  padding: 0.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+  background-color: #4D45E1;
+  border: none;
+  transition: background-color 0.3s ease;
+}
+
+.form-box .btn-submit:hover {
+  background-color: #3a32b8;
+}
+
+/* --- Estilos para enlaces dentro del formulario --- */
+.form-box .form-text {
+  font-size: 0.9rem;
+}
+
+.form-box .form-text a {
+  color: #a9a1ff; /* Un color morado claro que combina */
+  text-decoration: none;
+}
+
+.form-box .form-text a:hover {
+  text-decoration: underline;
+  color: #fff;
+}
+
+/* --- Responsividad para pantallas pequeñas --- */
+@media (max-width: 992px) {
+  .page-main {
+      flex-direction: column;
+      text-align: center;
+  }
+  .image-column {
+      order: -1;
+      margin-bottom: 2rem;
+  }
+  .header-title h1 {
+      font-size: 2.5rem;
+  }
+  .button-group {
+      flex-direction: column;
+  }
+  .footer-main-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .footer-info {
+    text-align: center;
+  }
+}
+
+/* --- Estilos específicos del Dashboard Paciente --- */
+.dashboard-body {
+  background-color: #073654;
+  background-image: none !important;
+  color: #ffffff; /* opcional: texto blanco sobre fondo oscuro */
+}
+
+/* Sidebar como tarjeta flotante */
+.sidebar {
+  height: 100vh;
+  background-color: #C8CADB;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.sidebar .logo {
+  display: block;
+  margin: 0 auto 1rem auto;
+  width: 80px;
+  height: auto;
+}
+
+.sidebar h6 {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  color: #6c757d;
+  padding-left: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.sidebar .nav-link {
+  color: #212529;
+  padding: 0.6rem 1rem;
+  border-radius: 0.375rem;
+  margin: 0.2rem 0.5rem;
+  font-weight: 500;
+}
+
+.sidebar .nav-link:hover {
+  background-color: #f0f2f5;
+}
+
+.sidebar .nav-link.active {
+  background-color: #0d6efd;
+  color: white !important;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding: 1rem;
+}
+
+/* Topbar como tarjeta flotante */
+.topbar {
+  background-color: #ffffff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.75rem;
+  margin: 1rem;
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.icon-btn {
+  background-color: #f8f9fa;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6c757d;
+}
+
+.profile-btn {
+  border-radius: 50%;
+  background-color: #0d6efd;
+  color: white;
+  width: 45px;
+  height: 45px;
+  font-size: 14px;
+  font-weight: bold;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+}
+
+.main-content {
+  background-color: #ffffff;
+  margin: 1rem;
+  padding: 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  color: #212529;
+
+  /* Ajuste nuevo */
+  height: calc(100vh - 6rem); /* igual que sidebar con márgenes */
+  overflow-y: auto; /* si el contenido crece, que haga scroll */
+}
+
+
+.dropdown-menu {
+  min-width: 160px;
+}
+
+/* ================= HISTORIAL DE CITAS (PACIENTE Y ESTUDIANTE) ================= */
+
+.accordion-item {
+  border: 1px solid #dee2e6;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  background-color: #ffffff;
+}
+
+.accordion-button {
+  background-color: #f8f9fa !important;
+  transition: background-color 0.3s ease, box-shadow 0.2s ease;
+  font-weight: 600;
+}
+
+.accordion-button:not(.collapsed) {
+  background-color: #e9ecef !important;
+  box-shadow: inset 0 -2px 0 #0d6efd40;
+}
+
+.accordion-button:focus {
+  box-shadow: none;
+}
+
+.accordion-body {
+  background-color: #ffffff;
+}
+
+.accordion-body p,
+.accordion-body li {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+/* Colores diferenciados */
+.cita-header-diagnostico {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #0d6efd; /* azul */
+}
+
+.cita-header-especialidad {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #198754; /* verde */
+}
+
+/* =========================================
+   PERFIL — Botón ancho y azul elegante
+   ========================================= */
+.perfil-wrap { padding: 2rem; }
+
+.perfil-card {
+  max-width: 1000px;
+  margin: 0 auto;
+  border-radius: 1.25rem;
+  background-color: #fff;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  border: none;
+}
+
+.perfil-header {
+  background-color: #f8fafc;
+  padding: 2rem 2.5rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.perfil-avatar-lg {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  border: 6px solid #fff;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+}
+
+.perfil-name {
+  font-weight: 700;
+  font-size: 1.9rem;
+  color: #212529;
+}
+
+.perfil-role {
+  font-size: 1rem;
+  color: #6c757d;
+}
+
+.perfil-form {
+  padding: 2rem 2.5rem 3rem 2.5rem;
+}
+
+.perfil-label {
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+  display: block;
+  color: #495057;
+}
+
+.perfil-control {
+  border: 2px solid #d0d5dd;
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  font-size: 1.05rem;
+  transition: 0.2s;
+}
+
+.perfil-control:focus {
+  border-color: #073654;
+  box-shadow: 0 0 0 0.25rem rgba(7,54,84,0.15);
+  outline: 0;
+}
+
+.perfil-readonly {
+  background-color: #f1f3f5;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+/* Botón a todo el ancho del bloque superior */
+.perfil-actions {
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.perfil-btn-azul {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 1.05rem;
+  padding: 0.8rem 1rem;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 2px 6px rgba(0, 123, 255, 0.3);
+}
+
+.perfil-btn-azul:hover {
+  background-color: #0056b3;
+  box-shadow: 0 4px 10px rgba(0, 86, 179, 0.35);
+}
+
+.perfil-btn-azul:active {
+  background-color: #004494;
+  box-shadow: 0 1px 4px rgba(0, 68, 148, 0.3);
+  transform: translateY(0);
+}
+
+.w-100 {
+  width: 100% !important;
+}
+
+@media (max-width: 768px) {
+  .perfil-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  .perfil-header .ms-4 {
+    margin-left: 0 !important;
+    margin-top: 1rem;
+  }
+  .perfil-form {
+    padding: 1.5rem;
+  }
+}
+
+/* Select de perfil (mismo estilo que los inputs) */
+.perfil-select {
+  background-color: #fff;
+  border: 2px solid #d0d5dd;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  font-size: 1.05rem;
+  color: #212529;
+  transition: 0.2s;
+}
+
+.perfil-select:focus {
+  border-color: #073654;
+  box-shadow: 0 0 0 0.25rem rgba(7,54,84,0.15);
+  outline: 0;
+}
+
+.perfil-select.perfil-readonly {
+  background-color: #f1f3f5;
+  color: #6c757d;
+  pointer-events: none;
+}
+
+.perfil-table {
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.perfil-table th {
+  background-color: #073654;
+  color: white;
+  font-weight: 600;
+}
+
+.perfil-table td input {
+  min-width: 120px;
+}
