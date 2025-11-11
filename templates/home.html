@@ -1,0 +1,62 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Perfect Teeth - Iniciar Sesión</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+
+    <div class="main-container">
+
+        <header class="page-header">
+            <img src="{% static 'imagenes/logo.png' %}" alt="Logo" class="header-logo">
+            <div class="header-title">
+                <h1>Perfect Teeth</h1>
+                <p>Clínicas Odontológicas Integrales</p>
+            </div>
+        </header>
+
+        <main class="page-main">
+            <div class="login-column">
+                <div class="login-box">
+                    <p class="login-text">
+                        Solicita tu cita en línea de manera rápida y sencilla. Un estudiante realizará tu valoración inicial y, posteriormente, tendrás la opción de elegir al especialista que continuará tu atención.
+                    </p>
+                    <div class="button-group">
+                        <a href="{% url 'login_paciente' %}" class="btn-login">Inicia sesión<br><b>paciente</b></a>
+                        <a href="{% url 'login_estudiante' %}"" class="btn-login">Inicia sesión<br><b>estudiante</b></a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="page-footer">
+        <div class="footer-container">
+
+            <div class="footer-main-content">
+                <img src="{% static 'imagenes/logo.png' %}" alt="Logo CUCS" class="footer-logo">
+                <div class="footer-info">
+                    <p><strong>CLÍNICAS ODONTOLÓGICAS INTEGRALES</strong></p>
+                    <p>Sierra Mojada 950, Col. Independencia, C.P. 44340,<br>Guadalajara, Jalisco, México</p>
+                    <p>Teléfono: +52 (33) 1058 5200</p>
+                </div>
+            </div>
+
+            <div class="footer-copyright">
+                <p>Derechos reservados ©2022 - 2025. PerfectTeeth.</p>
+            </div>
+
+        </div>
+    </footer>
+
+</body>
+</html>

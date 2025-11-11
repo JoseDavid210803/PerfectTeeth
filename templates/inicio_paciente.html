@@ -1,0 +1,627 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <style>
+    .flatpickr-calendar { z-index: 2000 !important; } /* Evita que se oculte bajo el layout */
+  </style>
+</head>
+<body class="dashboard-body">
+<div class="container-fluid">
+  <div class="row">
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 sidebar">
+      <div>
+        <img src="{% static 'imagenes/logo.png' %}" alt="Logo" class="logo">
+        <h6>Menú principal</h6>
+        <ul class="nav flex-column">
+          <li class="nav-item"><a class="nav-link active" href="#" onclick="mostrarSeccion('inicio')">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="mostrarSeccion('cita')">Crear tu cita</a></li>
+
+          {% if especialidad_habilitada and not tiene_especialidad_activa and not cita_especialidad_finalizada %}
+          <li class="nav-item">
+            <a class="nav-link" href="#" onclick="mostrarSeccion('especialidad')">
+              <i class="bi bi-hospital me-2"></i>Agendar cita de {{ especialidad_nombre }}
+            </a>
+          </li>
+        {% endif %}
+
+
+          <li class="nav-item"><a class="nav-link" href="#" onclick="mostrarSeccion('historial')">Historial</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" onclick="mostrarSeccion('seguimiento')">Seguimiento</a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="col-md-9 col-lg-10 px-0">
+      <!-- Topbar -->
+      <div class="topbar d-flex justify-content-between align-items-center">
+        <div><span class="mb-0">Inicio</span></div>
+        <div class="d-flex align-items-center gap-3 text-color ">
+          <span>{{ paciente.nombre }}</span>
+          <div class="dropdown">
+            <button class="profile-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+              {{ paciente.nombre|slice:":2" }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item" href="{% url 'perfil_paciente' %}">Perfil</a></li>
+              <li><a class="dropdown-item" href="#">Ayuda</a></li>
+              <li><a class="dropdown-item text-danger" href="{% url 'logout_paciente' %}">Cerrar sesión</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENIDO -->
+      <div class="main-content p-4">
+        <!-- INICIO -->
+        <section id="section-inicio">
+          <h3>Bienvenid@, {{ paciente.nombre }}</h3>
+          {% if alerta_especialidad %}
+          <div class="alert alert-info mt-3" role="alert">
+            <i class="bi bi-info-circle me-2"></i>{{ alerta_especialidad }}
+          </div>
+          {% endif %}
+          <p class="text-muted">Aquí puedes crear tu cita de diagnóstico o revisar tu historial.</p>
+        </section>
+
+        <!-- CREAR CITA -->
+        <section id="section-cita" class="d-none">
+          <div class="card shadow border-0 rounded-4">
+            <div class="card-body p-5">
+              <h4 class="text-primary fw-bold"><i class="bi bi-calendar-plus me-2"></i>Agendar cita de diagnóstico</h4>
+              <p class="text-muted mb-4">Selecciona la fecha y hora para tu cita.</p>
+              {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+              {% endif %}
+
+              <form method="post" class="row g-4">
+                {% csrf_token %}
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Fecha</label>
+                  <input type="text" id="fechaCita" name="fecha" class="form-control" placeholder="Selecciona una fecha" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">Hora</label>
+                  <select id="horaCita" name="hora" class="form-select" required>
+                    <option value="">Selecciona una hora</option>
+                  </select>
+                </div>
+                <div class="col-12 text-end">
+                  <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-check-circle me-2"></i>Agendar cita
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+                <!-- ESPECIALIDAD -->
+        <section id="section-especialidad" class="d-none">
+          <h4 class="text-primary mb-4">
+            <i class="bi bi-hospital me-2"></i>
+              Agendar cita de 
+              {% if especialidad_nombre %}
+                <span class="fw-bold ">{{ especialidad_nombre }}</span>
+              {% else %}
+                <span class="text-muted">Especialidad no especificada</span>
+              {% endif %}
+          </h4>
+
+          {% if estudiantes_info %}
+            <div class="row">
+              {% for est in estudiantes_info %}
+                <div class="col-12 mb-4">
+                  <div class="card border-0 shadow-sm rounded-4">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                          <h4 class="fw-bold mb-1">{{ est.nombre }} {{ est.apellido }}</h4>
+                          <p class="mb-0 text-muted"><i class="bi bi-person-badge me-1"></i>Especialidad: <strong>{{ est.especialidad }}</strong></p>
+                          <p class="mb-0 text-muted"><i class="bi bi-geo-alt me-1"></i>Área: <strong>{{ est.area }}</strong></p>
+                        </div>
+                        <div class="d-flex gap-2">
+                          <button class="btn btn-outline-primary" type="button" data-bs-toggle="collapse" data-bs-target="#horarios{{ forloop.counter }}" aria-expanded="false" aria-controls="horarios{{ forloop.counter }}">
+                            Ver horarios
+                          </button>
+                            <button class="btn btn-success" type="button" data-bs-toggle="collapse" data-bs-target="#formulario{{ est.id }}" aria-expanded="false" aria-controls="formulario{{ est.id }}">
+                              Seleccionar
+                            </button>
+                        </div>
+                      </div>
+
+                      <div class="collapse mt-3" id="horarios{{ forloop.counter }}">
+                        <h6 class="text-primary mb-3"><i class="bi bi-clock me-1"></i>Horarios disponibles</h6>
+                        <div class="table-responsive">
+                          <table class="table table-bordered table-sm">
+                            <thead class="table-light">
+                              <tr>
+                                <th>Día</th>
+                                <th>Horas</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {% for dia, horas in est.horarios.items %}
+                                <tr>
+                                  <td>{{ dia }}</td>
+                                  <td>{{ horas|join:", " }}</td>
+                                </tr>
+                              {% endfor %}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  <div class="collapse mt-4" id="formulario{{ est.id }}">
+                      <form method="post" action="{% url 'agendar_cita_especialidad' est.id %}">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                          <div class="col-md-6">
+                            <label class="form-label">Fecha</label>
+                                <select name="fecha" class="form-select" required>
+                                  <option value="">Selecciona una fecha</option>
+                                  {% for fecha in fechas_validas %}
+                                    <option value="{{ fecha }}">{{ fecha }}</option>
+                                  {% endfor %}
+                                </select>
+                          </div>
+                          <div class="col-md-6">
+                            <label class="form-label">Hora</label>
+                            <select name="hora" class="form-select" required>
+                              <option value="">Selecciona una hora</option>
+                              {% for dia, horas in est.horarios.items %}
+                                {% for hora in horas %}
+                                  <option value="{{ hora }}">{{ hora }} ({{ dia }})</option>
+                                {% endfor %}
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                        <div class="text-end mt-3">
+                          <button type="submit" class="btn btn-primary">Agendar cita</button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="alert alert-warning">No hay estudiantes disponibles para esta especialidad.</div>
+          {% endif %}
+        </section>
+
+
+        <!-- HISTORIAL -->
+        <section id="section-historial" class="d-none">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="text-primary mb-0"><i class="bi bi-clock-history me-2"></i>Historial de citas</h4>
+            <a href="{% url 'descargar_historial_pdf' %}" class="btn btn-outline-danger">
+              <i class="bi bi-file-earmark-pdf"></i> Descargar PDF
+            </a>
+          </div>
+
+          {% if citas %}
+            <div class="accordion" id="historialAccordion">
+              {% for cita in citas %}
+                <div class="accordion-item mb-4 shadow-sm border-0 rounded-4">
+
+                  <!-- CABECERA visible SIEMPRE -->
+                  <h2 class="accordion-header" id="heading{{ forloop.counter }}">
+                    <button class="accordion-button collapsed py-3 rounded-4" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapse{{ forloop.counter }}"
+                            aria-expanded="false"
+                            aria-controls="collapse{{ forloop.counter }}"
+                            style="background-color: #f8f9fa;">
+                      <div class="w-100 text-start">
+                        <!-- Tipo de cita (Diagnóstico o Especialidad) -->
+                        <div style="font-size: 1.2rem; font-weight: 700;
+                                    color: {% if cita.especialidad %}#198754{% else %}#0d6efd{% endif %};">
+                          {% if cita.especialidad %}
+                            🦷 Especialidad ({{ cita.especialidad }})
+                          {% else %}
+                            🩺 Diagnóstico
+                          {% endif %}
+                        </div>
+
+                        <!-- Nombre y edad -->
+                        <div class="fw-semibold text-dark">
+                          {{ cita.nombre_paciente }} - {{ cita.edad_paciente }} años
+                        </div>
+
+                        <!-- Fecha y hora -->
+                        <div class="text-muted">
+                          📅 {{ cita.fecha }} | 🕒 {{ cita.hora|time:"H:i" }}
+                        </div>
+                      </div>
+                    </button>
+                  </h2>
+
+                  <!-- CONTENIDO oculto que se expande -->
+                  <div id="collapse{{ forloop.counter }}" class="accordion-collapse collapse"
+                      aria-labelledby="heading{{ forloop.counter }}" data-bs-parent="#historialAccordion">
+                    <div class="accordion-body">
+                      
+                      <p><strong>Recomendaciones:</strong> {{ cita.descripcion|default:"Pendiente" }}</p>
+
+                      {% if cita.especialidad %}
+                        <!-- CITA DE ESPECIALIDAD -->
+                        <p><strong>Especialidad:</strong> {{ cita.especialidad }}</p>
+                        <p><strong>Código de Tarjetón:</strong> {{ cita.codigo_tarjeton|default:"Pendiente" }}</p>
+
+                        {% if cita.estudiante %}
+                          <p><strong>Estudiante asignado:</strong> {{ cita.estudiante.nombre }} {{ cita.estudiante.apellido }}</p>
+                          <p><strong>Contacto:</strong> {{ cita.estudiante.correo }}</p>
+                        {% else %}
+                          <p><strong>Estudiante asignado:</strong> <span class="text-muted">No registrado</span></p>
+                        {% endif %}
+
+                        <!-- 🔹 Botón para cancelar cita de especialidad -->
+                        {% if not cita.cancelada and cita.puede_eliminar %}
+                          <form method="post" action="{% url 'eliminar_cita' 'especialidad' cita.id %}" class="mt-2">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                              <i class="bi bi-trash"></i> Cancelar cita
+                            </button>
+                          </form>
+                        {% elif cita.cancelada %}
+                          <div class="alert alert-secondary mt-3 mb-0">
+                            Esta cita fue cancelada por el paciente.
+                          </div>
+                        {% endif %}
+
+                      {% else %}
+                        <!-- CITA DE DIAGNÓSTICO -->
+                        <p><strong>Código de Tarjetón:</strong> {{ cita.codigo_tarjeton|default:"Pendiente" }}</p>
+                        <p><strong>Estudios requeridos:</strong></p>
+                        <ul>
+                          {% for est in cita.estudios_requeridos.all %}
+                            <li>{{ est.nombre }}</li>
+                          {% empty %}
+                            <li>No se asignaron estudios.</li>
+                          {% endfor %}
+                        </ul>
+
+                        {% if cita.estudios_requeridos.all and cita.estudios_requeridos.all|length > 0 and not especialidad_habilitada %}
+                          <form method="post" action="{% url 'confirmar_estudios' cita.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success mt-3">
+                              <i class="bi bi-check2-circle me-1"></i> Tengo los estudios
+                            </button>
+                          </form>
+                        {% endif %}
+
+                        <!-- 🔹 Botón para cancelar cita de diagnóstico -->
+                        {% if not cita.cancelada and cita.puede_eliminar %}
+                          <form method="post" action="{% url 'eliminar_cita' 'diagnostico' cita.id %}" class="mt-2">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                              <i class="bi bi-trash"></i> Cancelar cita
+                            </button>
+                          </form>
+                        {% elif cita.cancelada %}
+                          <div class="alert alert-secondary mt-3 mb-0">
+                            Esta cita fue cancelada por el paciente.
+                          </div>
+                        {% endif %}
+                      {% endif %}
+
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="alert alert-info">Aún no tienes citas registradas.</div>
+          {% endif %}
+        </section>
+
+        <!-- SEGUIMIENTO -->
+        <section id="section-seguimiento" class="d-none">
+          <h4 class="text-primary mb-4">
+            <i class="bi bi-journal-medical me-2"></i>Seguimiento clínico
+          </h4>
+
+          <!-- BUSCADOR -->
+          <div class="row g-2 mb-3">
+            <div class="col-md-8">
+              <input id="buscadorSeguimiento" class="form-control" placeholder="Filtra por especialidad, doctor o palabra clave...">
+            </div>
+            <div class="col-md-4 text-md-end">
+              <button type="button" class="btn btn-outline-secondary" onclick="printSeguimiento()">
+                <i class="bi bi-printer me-1"></i> Imprimir / Guardar PDF
+              </button>
+            </div>
+          </div>
+            {% if citas_finalizadas %}
+              <h5 class="text-secondary mt-4 mb-3"><i class="bi bi-clipboard-check me-2"></i>Citas finalizadas</h5>
+              <div class="accordion mb-4" id="finalizadasAccordion">
+                {% for cita in citas_finalizadas %}
+                  <div class="accordion-item mb-3 shadow-sm border-0 rounded-4 seguimiento-item"
+                       data-text="{{ cita.especialidad }} {{ cita.descripcion|default:'' }} {{ cita.codigo_tarjeton|default:'' }}">
+                    <h2 class="accordion-header" id="headingFin{{ forloop.counter }}">
+                      <button class="accordion-button collapsed py-3 rounded-4" type="button"
+                              data-bs-toggle="collapse"
+                              data-bs-target="#collapseFin{{ forloop.counter }}"
+                              aria-expanded="false"
+                              aria-controls="collapseFin{{ forloop.counter }}"
+                              style="background-color: #f8f9fa;">
+                        <div class="w-100 text-start">
+                          <div class="d-flex align-items-center justify-content-between">
+                            <div class="fw-bold">
+                              🦷 Especialidad — {{ cita.fecha }} | {{ cita.hora|time:"H:i" }}
+                            </div>
+                            <span class="badge bg-success"><i class="bi bi-check-circle"></i> Finalizada</span>
+                          </div>
+                          <div class="text-muted small mt-1">
+                            Paciente: {{ cita.nombre_paciente }} — {{ cita.edad_paciente }} años
+                          </div>
+                        </div>
+                      </button>
+                    </h2>
+                    <div id="collapseFin{{ forloop.counter }}" class="accordion-collapse collapse"
+                         aria-labelledby="headingFin{{ forloop.counter }}" data-bs-parent="#finalizadasAccordion">
+                      <div class="accordion-body">
+                        <p class="mb-1 fw-semibold">Especialidad</p>
+                        <div class="bg-light p-3 rounded border">
+                          {{ cita.especialidad }}
+                        </div>
+
+                        {% if cita.descripcion %}
+                          <hr>
+                          <p class="mb-1 fw-semibold">Descripción</p>
+                          <div class="bg-light p-3 rounded border">
+                            {{ cita.descripcion }}
+                          </div>
+                        {% endif %}
+
+                        {% if cita.codigo_tarjeton %}
+                          <hr>
+                          <p class="mb-1 fw-semibold">Código de tarjetón</p>
+                          <div class="bg-light p-3 rounded border">
+                            {{ cita.codigo_tarjeton }}
+                          </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          {% if seguimientos %}
+            <div class="accordion" id="seguimientoAccordion">
+              {% for seg in seguimientos %}
+                <div class="accordion-item mb-4 shadow-sm border-0 rounded-4 seguimiento-item"
+                    data-text="{{ seg.tipo }} {{ seg.especialidad|default:'' }} {{ seg.doctor }} {{ seg.recomendaciones|default:'' }} {{ seg.comentarios|default:'' }}">
+                  <h2 class="accordion-header" id="headingSeg{{ forloop.counter }}">
+                    <button class="accordion-button collapsed py-3 rounded-4" type="button"
+                            data-bs-toggle="collapse"
+                            data-bs-target="#collapseSeg{{ forloop.counter }}"
+                            aria-expanded="false"
+                            aria-controls="collapseSeg{{ forloop.counter }}"
+                            style="background-color: #f8f9fa;">
+                      <div class="w-100 text-start">
+                        <div class="d-flex align-items-center justify-content-between">
+                          <div class="fw-bold">
+                            {% if seg.tipo == 'Especialidad' %}🦷{% else %}🩺{% endif %}
+                            {{ seg.tipo }} — {{ seg.fecha }} | {{ seg.hora|time:"H:i" }}
+                          </div>
+                          <div class="d-flex gap-2">
+                            {% if seg.recomendaciones %}
+                              <span class="badge bg-success"><i class="bi bi-clipboard2-check"></i> Con recomendaciones</span>
+                            {% else %}
+                              <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i> Pendiente</span>
+                            {% endif %}
+                            <span class="badge bg-info d-none d-md-inline">
+                              <i class="bi bi-hospital"></i> {{ seg.especialidad|default:"Diagnóstico" }}
+                            </span>
+                          </div>
+                        </div>
+                        <div class="text-muted small mt-1">
+                          Dr(a). {{ seg.doctor }}
+                        </div>
+                      </div>
+                    </button>
+                  </h2>
+
+                  <div id="collapseSeg{{ forloop.counter }}" class="accordion-collapse collapse"
+                      aria-labelledby="headingSeg{{ forloop.counter }}" data-bs-parent="#seguimientoAccordion">
+                    <div class="accordion-body">
+                      <p class="mb-1 fw-semibold">Recomendaciones</p>
+                      <div class="bg-light p-3 rounded border">
+                        {{ seg.recomendaciones|default:"Sin recomendaciones registradas." }}
+                      </div>
+
+                      {% if seg.comentarios %}
+                        <hr>
+                        <p class="mb-1 fw-semibold">Comentarios del doctor</p>
+                        <div class="bg-light p-3 rounded border">
+                          {{ seg.comentarios }}
+                        </div>
+                      {% endif %}
+
+                      <div class="mt-3 d-flex flex-wrap gap-2">
+                        <button type="button" class="btn btn-outline-primary btn-sm"
+                                onclick="copiarTextoSeguimiento(this)"
+                                data-text="Fecha: {{ seg.fecha }} {{ seg.hora|time:'H:i' }} | {{ seg.tipo }} ({{ seg.especialidad|default:'Diagnóstico' }}) | Doctor: {{ seg.doctor }} | Recomendaciones: {{ seg.recomendaciones|default:'N/A' }}{% if seg.comentarios %} | Comentarios: {{ seg.comentarios }}{% endif %}">
+                          <i class="bi bi-clipboard"></i> Copiar
+                        </button>
+                        <button type="button" class="btn btn-outline-success btn-sm"
+                                onclick="marcarLeido(this)">
+                          <i class="bi bi-check2-circle"></i> Marcar como leído
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm"
+                                onclick="agregarNotaLocal(this)" data-id="seg{{ forloop.counter }}">
+                          <i class="bi bi-pencil-square"></i> Añadir nota personal
+                        </button>
+                      </div>
+
+                      <div class="mt-3">
+                        <label class="form-label small text-muted">Tu nota (solo visible para ti)</label>
+                        <textarea class="form-control nota-personal" rows="2" data-id="seg{{ forloop.counter }}"
+                                  placeholder="Escribe aquí un recordatorio o síntoma..."></textarea>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>No tienes seguimientos registrados aún.
+            </div>
+          {% endif %}
+        </section>
+      </div>
+    </div>
+      <footer class="page-footer">
+          <div class="footer-container">
+
+              <div class="footer-main-content">
+                  <img src="{% static 'imagenes/logo.png' %}" alt="Logo CUCS" class="footer-logo">
+                  <div class="footer-info">
+                      <p><strong>CLÍNICAS ODONTOLÓGICAS INTEGRALES</strong></p>
+                      <p>Sierra Mojada 950, Col. Independencia, C.P. 44340,<br>Guadalajara, Jalisco, México</p>
+                      <p>Teléfono: +52 (33) 1058 5200</p>
+                  </div>
+              </div>
+
+              <div class="footer-copyright">
+                  <p>Derechos reservados ©2022 - 2025. PerfectTeeth.</p>
+              </div>
+
+          </div>
+      </footer>
+  </div>
+</div>
+
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="{% static 'js/Diagnosticos.js' %}"></script>
+
+{% if error %}
+<!-- Si hay error al agendar cita, se muestra directamente esa sección -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    mostrarSeccion('cita');
+  });
+</script>
+{% endif %}
+
+<script>
+  // ============================
+  // SEGUIMIENTO CLÍNICO - Funciones JS
+  // ============================
+
+  document.addEventListener('DOMContentLoaded', function () {
+
+    // === Filtro de búsqueda ===
+    const input = document.getElementById('buscadorSeguimiento');
+    if (input) {
+      input.addEventListener('input', function () {
+        const q = this.value.toLowerCase().trim();
+        document.querySelectorAll('.seguimiento-item').forEach(card => {
+          const txt = (card.getAttribute('data-text') || '').toLowerCase();
+          card.style.display = txt.includes(q) ? '' : 'none';
+        });
+      });
+    }
+
+    // === Guardar notas personales ===
+    document.querySelectorAll('.nota-personal').forEach(area => {
+      const key = 'nota_' + area.dataset.id;
+      const val = localStorage.getItem(key);
+      if (val) area.value = val;
+
+      area.addEventListener('input', () => {
+        localStorage.setItem(key, area.value);
+      });
+    });
+  });
+
+  // === Copiar texto del seguimiento ===
+  function copiarTextoSeguimiento(btn) {
+    const txt = btn.getAttribute('data-text') || '';
+    navigator.clipboard.writeText(txt).then(() => {
+      btn.innerHTML = '<i class="bi bi-clipboard-check"></i> ¡Copiado!';
+      setTimeout(() => btn.innerHTML = '<i class="bi bi-clipboard"></i> Copiar', 1500);
+    });
+  }
+
+  // === Marcar como leído ===
+  function marcarLeido(btn) {
+    const item = btn.closest('.accordion-item');
+    const header = item.querySelector('.accordion-button .d-flex.gap-2');
+    if (!header) return;
+
+    // Cambia estilo visual
+    item.classList.add('border', 'border-success', 'bg-opacity-10');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-check2"></i> Leído';
+
+    // Agrega etiqueta "Leído ✅" junto a las otras badges
+    const badge = document.createElement('span');
+    badge.className = 'badge bg-success';
+    badge.innerHTML = '<i class="bi bi-check2-circle"></i> Leído';
+    header.appendChild(badge);
+  }
+
+  // === Añadir nota personal ===
+  function agregarNotaLocal(btn) {
+    const id = btn.getAttribute('data-id');
+    const area = document.querySelector(`.nota-personal[data-id="${id}"]`);
+    if (!area) return;
+    area.focus();
+
+    btn.innerHTML = '<i class="bi bi-check2-square"></i> Nota lista';
+    setTimeout(() => {
+      btn.innerHTML = '<i class="bi bi-pencil-square"></i> Añadir nota personal';
+    }, 1500);
+  }
+
+  // === Imprimir / Guardar PDF solo del seguimiento abierto ===
+  function printSeguimiento() {
+    const abierto = document.querySelector('.accordion-collapse.show');
+    if (!abierto) {
+      alert('Por favor, abre un seguimiento antes de imprimir o guardar.');
+      return;
+    }
+
+    // Clonar el contenido visible del seguimiento abierto
+    const contenido = abierto.cloneNode(true);
+
+    // Crear una ventana temporal para imprimir solo ese contenido
+    const ventana = window.open('', '_blank');
+    ventana.document.write(`
+      <html>
+        <head>
+          <title>Seguimiento Clínico</title>
+          <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+          <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+          <style>
+            body { font-family: 'Segoe UI', sans-serif; margin: 30px; }
+            .titulo { font-size: 1.5rem; font-weight: bold; color: #0d6efd; margin-bottom: 1rem; }
+            .section { margin-top: 1.5rem; }
+          </style>
+        </head>
+        <body>
+          <div class="titulo">Reporte de Seguimiento Clínico</div>
+          ${contenido.innerHTML}
+        </body>
+      </html>
+    `);
+    ventana.document.close();
+    ventana.print();
+  }
+</script>
+</body>
+</html>

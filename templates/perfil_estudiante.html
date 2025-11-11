@@ -1,0 +1,264 @@
+{% load static %}
+{% load custom_filters %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Perfil del Estudiante</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body class="dashboard-body">
+
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- Sidebar -->
+    <nav class="col-md-3 col-lg-2 sidebar">
+      <div>
+        <img src="{% static 'imagenes/logo.png' %}" alt="Logo" class="logo">
+        <h6>Menú principal</h6>
+        <ul class="nav flex-column">
+          <li class="nav-item"><a class="nav-link" href="{% url 'inicio_estudiante' %}">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link active" href="{% url 'perfil_estudiante' %}">Perfil</a></li>
+        </ul>
+      </div>
+      <div class="sidebar-bottom">
+        <a class="nav-link" href="#">¿Necesitas ayuda?</a>
+      </div>
+    </nav>
+
+    <!-- Contenido principal -->
+    <div class="col-md-9 col-lg-10 px-0">
+      <!-- Topbar -->
+      <div class="topbar d-flex justify-content-between align-items-center">
+        <div><span class="mb-0">Perfil del Estudiante</span></div>
+        <div class="d-flex align-items-center gap-3 text-color">
+          <span>{{ estudiante.nombre }}</span>
+          <div class="dropdown">
+            <button class="profile-btn dropdown-toggle" data-bs-toggle="dropdown">
+              {{ estudiante.nombre|slice:":2" }}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><a class="dropdown-item " href="{% url 'inicio_estudiante' %}">Inicio</a></li>
+              <li><a class="dropdown-item " href="#">Ayuda</a></li>
+              <li><a class="dropdown-item text-danger" href="{% url 'logout_estudiante' %}">Cerrar sesión</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Perfil -->
+      <div class="main-content perfil-wrap">
+        <div class="card perfil-card shadow">
+          <div class="perfil-header d-flex align-items-center">
+            <img src="{% static 'imagenes/perfil.png' %}" class="perfil-avatar-lg" alt="Avatar estudiante">
+            <div class="ms-4 text-start">
+              <h2 class="perfil-name mb-1">{{ estudiante.nombre }} {{ estudiante.apellido }}</h2>
+              <p class="perfil-role mb-0">Área: {{ estudiante.area|default:"Sin asignar" }}</p>
+            </div>
+          </div>
+
+          <div class="perfil-form">
+            {% if messages %}
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+              {% endfor %}
+            {% endif %}
+
+            <form method="post" id="formEstudiante">
+              {% csrf_token %}
+              <div class="row g-4">
+                <!-- Correo -->
+                <div class="col-md-6">
+                  <label class="perfil-label">Correo</label>
+                  <input type="email" name="correo" value="{{ estudiante.correo }}" class="form-control perfil-control perfil-readonly" disabled>
+                </div>
+
+                <!-- Código -->
+                <div class="col-md-6">
+                  <label class="perfil-label">Código de estudiante</label>
+                  <input type="text" name="codigo_estudiante" value="{{ estudiante.codigo_estudiante }}" class="form-control perfil-control perfil-readonly" disabled>
+                </div>
+
+                <!-- Semestre -->
+                <div class="col-md-4">
+                  <label class="perfil-label">Semestre</label>
+                  <input type="number" name="semestre" value="{{ estudiante.semestre }}" min="1" max="12" class="form-control perfil-control perfil-readonly" disabled>
+                </div>
+
+                <!-- Área -->
+                <div class="col-md-8">
+                  <label class="perfil-label">Área asignada</label>
+                  <input type="text" name="area" value="{{ estudiante.area }}" class="form-control perfil-control perfil-readonly" disabled>
+                </div>
+
+                <!-- Dirección del consultorio -->
+                <div class="col-md-12 mt-3">
+                  <label class="perfil-label">Dirección del consultorio</label>
+                  <input type="text" 
+                        name="direccion_consultorio" 
+                        class="form-control perfil-control perfil-readonly" 
+                        placeholder="Ej. Av. Juárez 123, Col. Centro, Guadalajara, Jalisco"
+                        value="{{ estudiante.direccion_consultorio|default:'' }}" 
+                        disabled>
+                </div>
+
+                <!-- Nivel / Especialidad -->
+                <div class="col-md-12">
+                  <!-- Diagnóstico -->
+                  <div id="nivelDiagnostico" style="{% if estudiante.semestre != 4 %}display:none;{% endif %}">
+                    <label class="perfil-label">Nivel</label>
+                    <input type="text" value="Diagnóstico" class="form-control perfil-control" disabled>
+                  </div>
+
+                  <!-- Especialidad -->
+                  <div id="nivelEspecialidad" style="{% if estudiante.semestre < 5 %}display:none;{% endif %}">
+                    <label class="perfil-label">Especialidad</label>
+                    <select name="especialidad" id="selectEspecialidad" class="form-select perfil-control perfil-select perfil-readonly" disabled>
+                      <option value="">Selecciona una especialidad</option>
+                      <option value="Ortodoncia" {% if estudiante.especialidad == "Ortodoncia" %}selected{% endif %}>Ortodoncia</option>
+                      <option value="Endodoncia" {% if estudiante.especialidad == "Endodoncia" %}selected{% endif %}>Endodoncia</option>
+                      <option value="Periodoncia" {% if estudiante.especialidad == "Periodoncia" %}selected{% endif %}>Periodoncia</option>
+                      <option value="Prótesis" {% if estudiante.especialidad == "Prótesis" %}selected{% endif %}>Prótesis</option>
+                      <option value="Odontopediatría" {% if estudiante.especialidad == "Odontopediatría" %}selected{% endif %}>Odontopediatría</option>
+                    </select>
+
+                    <!-- Horario -->
+                    <label class="perfil-label mt-3">Horario de atención (7:00 – 19:00)</label>
+                    <div class="table-responsive">
+                      <table class="table table-bordered align-middle text-center perfil-table">
+                        <thead class="table-light">
+                          <tr>
+                            <th>Día</th>
+                            <th>Hora inicio</th>
+                            <th>Hora fin</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for dia in dias %}
+                            {% with horario_dia=horario|dictsort:dia %}
+                            <tr>
+                              <td>{{ dia }}</td>
+                              <td>
+                                <input type="time"
+                                      class="form-control perfil-control perfil-readonly"
+                                      name="{{ dia|lower }}_inicio"
+                                      min="07:00" max="19:00"
+                                      value="{{ horario|get_item:dia|get_index:0|default_if_none:'' }}"
+                                      disabled>
+                              </td>
+                              <td>
+                                <input type="time"
+                                      class="form-control perfil-control perfil-readonly"
+                                      name="{{ dia|lower }}_fin"
+                                      min="07:00" max="19:00"
+                                      value="{{ horario|get_item:dia|get_index:1|default_if_none:'' }}"
+                                      disabled>
+                              </td>
+                            </tr>
+                            {% endwith %}
+                          {% endfor %}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botón de acción -->
+              <div class="perfil-actions mt-4">
+                <button type="button" id="btnEditEst" class="btn perfil-btn-azul w-100">
+                  <i class="bi bi-pencil-square"></i> Editar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+      <footer class="page-footer">
+          <div class="footer-container">
+
+              <div class="footer-main-content">
+                  <img src="{% static 'imagenes/logo.png' %}" alt="Logo CUCS" class="footer-logo">
+                  <div class="footer-info">
+                      <p><strong>CLÍNICAS ODONTOLÓGICAS INTEGRALES</strong></p>
+                      <p>Sierra Mojada 950, Col. Independencia, C.P. 44340,<br>Guadalajara, Jalisco, México</p>
+                      <p>Teléfono: +52 (33) 1058 5200</p>
+                  </div>
+              </div>
+
+              <div class="footer-copyright">
+                  <p>Derechos reservados ©2022 - 2025. PerfectTeeth.</p>
+              </div>
+
+          </div>
+      </footer>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // --- Lógica de edición/guardado ---
+  (function(){
+    const btn = document.getElementById('btnEditEst');
+    const form = document.getElementById('formEstudiante');
+    const inputs = form.querySelectorAll('.perfil-control');
+    let edit = false;
+
+    btn.addEventListener('click', () => {
+      edit = !edit;
+      inputs.forEach(i => {
+        i.disabled = !edit;
+        i.classList.toggle('perfil-readonly', !edit);
+      });
+
+      btn.innerHTML = edit
+        ? '<i class="bi bi-check2-circle me-1"></i> Guardar cambios'
+        : '<i class="bi bi-pencil-square me-1"></i> Editar';
+
+      // Antes de enviar, habilita todo para incluirlo en POST
+      if (!edit) {
+        inputs.forEach(i => i.disabled = false);
+        form.submit();
+      }
+    });
+  })();
+
+  // --- Mostrar diagnóstico/especialidad según semestre ---
+  const inputSemestre = document.querySelector('input[name="semestre"]');
+  const divDiagnostico = document.getElementById('nivelDiagnostico');
+  const divEspecialidad = document.getElementById('nivelEspecialidad');
+  const areaInput = document.querySelector('input[name="area"]');
+
+  if (inputSemestre) {
+    inputSemestre.addEventListener('input', () => {
+      const sem = parseInt(inputSemestre.value) || 0;
+
+      // Mostrar bloques según semestre
+      if (sem === 4) {
+        divDiagnostico.style.display = "block";
+        divEspecialidad.style.display = "none";
+        areaInput.value = "Diagnóstico";
+      } else if (sem >= 5) {
+        divDiagnostico.style.display = "none";
+        divEspecialidad.style.display = "block";
+        areaInput.value = "Especialidad";
+      } else {
+        divDiagnostico.style.display = "none";
+        divEspecialidad.style.display = "none";
+        areaInput.value = "";
+      }
+    });
+  }
+</script>
+
+</body>
+</html>
