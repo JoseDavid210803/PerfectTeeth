@@ -16,10 +16,14 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from django.shortcuts import redirect
+from django.shortcuts import render
+
+def home(request):
+    return render(request, 'home.html')  # 👈 renderiza tu template home.html
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', lambda request: redirect('login_paciente')),  # 👈 redirige la raíz al login de pacientes
-    path('', include('usuarios.urls')),  # 👈 incluye todas las rutas de la app usuarios
+    path('', home, name='home'),         # 👈 Página raíz
+    path('', include('usuarios.urls')),  # 👈 Rutas de la app usuarios
 ]
+

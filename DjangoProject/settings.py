@@ -131,7 +131,7 @@ USE_TZ = True
 #PRODUCTION-------
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / "elements" / "static"] 
+STATICFILES_DIRS = [BASE_DIR / "static"] 
 #PRODUCTION-------
 
 # Default primary key field type
